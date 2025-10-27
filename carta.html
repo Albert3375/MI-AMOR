@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta para Jasive</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffe6f0, #fff0f5, #f9e6ff);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        /* Estilos del sobre - REDISEÑADO */
+        .envelope-container {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            cursor: pointer;
+            z-index: 10;
+            margin-top: 50px;
+            perspective: 1000px;
+            filter: drop-shadow(0 10px 20px rgba(214, 51, 132, 0.3));
+        }
+
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff5ca1, #d63384);
+            border-radius: 12px;
+            transition: transform 0.5s ease;
+            transform-style: preserve-3d;
+            overflow: hidden;
+        }
+
+        .envelope:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff2f84, #ff5ca1);
+            clip-path: polygon(0% 0%, 50% 50%, 100% 0%);
+            border-radius: 12px;
+            z-index: 2;
+        }
+
+        .envelope:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff8cb8, #ff5ca1);
+            clip-path: polygon(0% 0%, 0% 100%, 50% 50%);
+            border-radius: 12px;
+            z-index: 1;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: -50px;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: linear-gradient(135deg, #ff2f84, #ff5ca1);
+            clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+            border-radius: 12px 12px 0 0;
+            transform-origin: top;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 3;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .envelope-container.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        .envelope-container.open .envelope {
+            transform: translateY(-20px) rotateX(10deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .heart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 40px;
+            z-index: 4;
+            transition: transform 0.5s ease;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+        }
+
+        .envelope-container:hover .heart {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .instruction {
+            margin-top: 20px;
+            color: #d63384;
+            font-weight: bold;
+            text-align: center;
+            opacity: 0.8;
+            animation: pulse 2s infinite;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        /* Estilos de la carta - COMPLETAMENTE REDISEÑADO */
+        .letter-container {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            height: 500px;
+            display: none;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            z-index: 5;
+        }
+
+        .letter-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .letter {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #fff9fb, #fff);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            transform-origin: top center;
+            transform: rotateX(90deg) scale(0.8);
+            transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow-y: auto;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .letter.open {
+            transform: rotateX(0deg) scale(1);
+        }
+
+        .letter-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(214, 51, 132, 0.2);
+        }
+
+        .letter-header h1 {
+            color: #d63384;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .letter-header p {
+            color: #ff5ca1;
+            font-size: 1.2em;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .letter-content {
+            line-height: 1.8;
+            color: #444;
+            font-size: 1.1em;
+            flex-grow: 1;
+            padding: 10px 0;
+        }
+
+        .letter-content p {
+            margin-bottom: 20px;
+            text-align: justify;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .letter-content p:before {
+            content: "❀";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: #ff5ca1;
+            font-size: 0.8em;
+        }
+
+        .letter-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #d63384;
+            font-size: 1.3em;
+            padding-top: 20px;
+            border-top: 2px solid rgba(214, 51, 132, 0.2);
+            position: relative;
+        }
+
+        .letter-footer:before {
+            content: "✽";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff9fb;
+            padding: 0 15px;
+            color: #ff5ca1;
+            font-size: 1.5em;
+        }
+
+        /* Estilos del carrusel - OPTIMIZADO PARA IMÁGENES VERTICALES */
+        .carousel-container {
+            width: 90%;
+            max-width: 400px;
+            margin: 40px auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .carousel-container.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .carousel {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .carousel-item {
+            min-width: 100%;
+            height: 550px;
+            position: relative;
+        }
+
+        .carousel-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .carousel-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            color: #d63384;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 6;
+            opacity: 0;
+            backdrop-filter: blur(5px);
+        }
+
+        .carousel-container:hover .carousel-btn {
+            opacity: 1;
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-btn.prev {
+            left: 20px;
+        }
+
+        .carousel-btn.next {
+            right: 20px;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 6;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        /* Corazones flotantes */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-heart {
+            position: absolute;
+            color: #ff5ca1;
+            font-size: 24px;
+            opacity: 0;
+            animation: float 8s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Efectos de confeti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #ff5ca1;
+            opacity: 0;
+            z-index: 100;
+        }
+
+        /* Estrellas flotantes */
+        .floating-stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-star {
+            position: absolute;
+            color: #ffd700;
+            font-size: 18px;
+            opacity: 0;
+            animation: floatStar 10s linear infinite;
+        }
+
+        @keyframes floatStar {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Controles de audio */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .audio-btn {
+            background: #d63384;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .audio-btn:hover {
+            background: #ff5ca1;
+            transform: scale(1.1);
+        }
+
+        /* Mensaje de carga de música */
+        .music-loading {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            color: #d63384;
+            z-index: 100;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Placeholder para imágenes faltantes */
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff5ca1, #d63384);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2em;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .placeholder-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        /* Efecto de brillo para elementos importantes */
+        .glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #ff5ca1, 0 0 20px #ff5ca1;
+            }
+            to {
+                box-shadow: 0 0 10px #fff, 0 0 15px #ff5ca1, 0 0 20px #ff5ca1, 0 0 25px #ff5ca1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .envelope-container {
+                width: 250px;
+                height: 170px;
+            }
+            
+            .letter-container {
+                height: 450px;
+            }
+            
+            .letter {
+                padding: 25px;
+            }
+            
+            .letter-header h1 {
+                font-size: 2em;
+            }
+            
+            .carousel-item {
+                height: 500px;
+            }
+            
+            .carousel-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .envelope-container {
+                width: 200px;
+                height: 140px;
+            }
+            
+            .letter-container {
+                height: 400px;
+            }
+            
+            .heart {
+                font-size: 30px;
+            }
+            
+            .letter {
+                padding: 20px;
+            }
+            
+            .letter-header h1 {
+                font-size: 1.7em;
+            }
+            
+            .letter-content {
+                font-size: 1em;
+            }
+            
+            .carousel-item {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sobre animado -->
+        <div class="envelope-container" id="envelope">
+            <div class="envelope"></div>
+            <div class="envelope-flap"></div>
+            <div class="heart">💌</div>
+        </div>
+        <p class="instruction">¡Haz clic en el sobre para abrir la carta!</p>
+        
+        <!-- Carta -->
+        <div class="letter-container" id="letter-container">
+            <div class="letter" id="letter">
+                <div class="letter-header">
+                    <h1>Para Mi Querida Jasive</h1>
+                    <p>Con todo mi amor...</p>
+                </div>
+                
+                <div class="letter-content">
+                    <p>🌹 En estos dos meses me he dado cuenta de que eres una niña maravillosa, tan guapa, tan inteligente y con un corazón increíble 💫. Cada día contigo he aprendido algo nuevo, y de verdad, valoro muchísimo todo lo que hemos vivido 💕.</p>
+                    
+                    <p>Quizá tuvimos nuestras pláticas, nuestras confusiones o errores… pero lo que más admiro de nosotros es que somos diferentes, porque sabemos aceptarlos y seguir adelante juntos 🤝💖. Eso es algo que aprecio con todo mi corazón.</p>
+                    
+                    <p>Gracias por tu tiempo, por tus palabras, por tu forma de ser… 🌷 todo eso es muy valioso para mí. No tienes idea de lo importante que eres en mi vida, al punto de que no quiero estar con nadie más que contigo 💞.</p>
+                    
+                    <p>Te juro que siempre haré lo posible por verte bien, por sacarte una sonrisa, por demostrarte que mi cariño hacia ti es verdadero y muy grande 💌. Estoy seguro de lo que siento por ti: un amor inmenso, sincero y lleno de ternura 💗.</p>
+                    
+                    <p>Quiero seguir caminando a tu lado, llegar lejos contigo, si tú me lo permites 🚀💑. Te quiero más allá de lo que puedas imaginar, y créeme… amo todo de ti. Eso nunca, pero NUNCA, lo voy a cambiar por nada ni por nadie en este mundo 🌍❤.</p>
+                    
+                    <p>Gracias, Jasive, por ser parte de mi vida, por dejarme conocerte, por cada momento compartido 🥰. Sé que no soy perfecto, pero te juro que te quiero hasta el punto de amarte, y aunque sueno fuerte, no me importa decirlo, porque lo que siento es real y único 💞.</p>
+                    
+                    <p>Gracias por todo lo que hemos pasado en estos dos meses. Te quiere muchísimo este niño latosillo y pregunton 😅💖.</p>
+                </div>
+                
+                <div class="letter-footer">
+                    <p>✨ Te quiero demasiado… infinitamente. ✨</p>
+                </div>
+            </div>
+        </div>
+        
+       <!-- Carrusel de fotos - VERSION EMOTIVA -->
+<div class="carousel-container" id="carousel">
+    <div class="carousel" id="carousel-slider">
+
+        <div class="carousel-item">
+            <img src="img/1.jpg" alt="Nuestro primer momento" class="carousel-img">
+            <div class="carousel-caption">
+                <h3>Gracias por aparecer 💫</h3>
+                <p>Gracias por llegar un día cualquiera... y cambiar mi mundo de la noche a la mañana. Desde ese instante, todo tiene más sentido.</p>
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <img src="img/2.jpg" alt="Paseando juntos" class="carousel-img">
+            <div class="carousel-caption">
+                <h3>El destino nos cruzó 💕</h3>
+                <p>Haberte encontrado mientras no buscaba nada… fue lo más lindo que me pudo pasar. Eres mi casualidad más hermosa.</p>
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <img src="img/3.jpg" alt="Atardecer romántico" class="carousel-img">
+            <div class="carousel-caption">
+                <h3>La magia de verte 🌅</h3>
+                <p>Qué cosa más bonita es mirarte, descubrirte… y darme cuenta de lo increíblemente bella que eres, por dentro y por fuera.</p>
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <img src="img/4.jpg" alt="Risa y diversión" class="carousel-img">
+            <div class="carousel-caption">
+                <h3>Lo que siento por ti 💖</h3>
+                <p>Podría decirte cuánto te quiero… pero tú eres mucho más que un simple “te quiero”. Eres todo lo que mi corazón soñó.</p>
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <img src="img/5.jpg" alt="Miradas de amor" class="carousel-img">
+            <div class="carousel-caption">
+                <h3>Mi razón de sonreír 🌹</h3>
+                <p>En tus ojos encontré mi paz, mi lugar seguro, y la certeza de que el amor verdadero sí existe.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+            
+            <button class="carousel-btn prev" id="prev-btn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-btn next" id="next-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <div class="carousel-indicators" id="indicators">
+                <!-- Los indicadores se generan con JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Corazones flotantes -->
+    <div class="floating-hearts" id="floating-hearts"></div>
+    
+    <!-- Estrellas flotantes -->
+    <div class="floating-stars" id="floating-stars"></div>
+    
+    <!-- Controles de audio -->
+    <div class="audio-controls">
+        <button class="audio-btn" id="audio-btn">
+            <i class="fas fa-music"></i>
+        </button>
+    </div>
+    
+    <!-- Mensaje de carga de música -->
+    <div class="music-loading" id="music-loading">
+        Cargando música...
+    </div>
+    
+    <!-- Elementos de audio - MANTENIENDO LAS RUTAS ORIGINALES -->
+    <audio id="background-music" loop>
+        <source src="audio/cancion1.mp3" type="audio/mpeg">
+        <source src="audio/cancion-romantica.ogg" type="audio/ogg">
+        <source src="audio/cancion-romantica.wav" type="audio/wav">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+    
+    <audio id="envelope-sound">
+        <source src="audio/sobre.mp3" type="audio/mpeg">
+        <source src="audio/sobre.ogg" type="audio/ogg">
+        <source src="audio/sobre.wav" type="audio/wav">
+    </audio>
+    
+    <audio id="letter-sound">
+        <source src="audio/carta.mp3" type="audio/mpeg">
+        <source src="audio/carta.ogg" type="audio/ogg">
+        <source src="audio/carta.wav" type="audio/wav">
+    </audio>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const envelope = document.getElementById('envelope');
+            const letterContainer = document.getElementById('letter-container');
+            const letter = document.getElementById('letter');
+            const carousel = document.getElementById('carousel');
+            const carouselSlider = document.getElementById('carousel-slider');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const indicators = document.getElementById('indicators');
+            const floatingHearts = document.getElementById('floating-hearts');
+            const floatingStars = document.getElementById('floating-stars');
+            const audioBtn = document.getElementById('audio-btn');
+            const backgroundMusic = document.getElementById('background-music');
+            const envelopeSound = document.getElementById('envelope-sound');
+            const letterSound = document.getElementById('letter-sound');
+            const musicLoading = document.getElementById('music-loading');
+            
+            let currentSlide = 0;
+            const totalSlides = document.querySelectorAll('.carousel-item').length;
+            let isOpening = false;
+            let isMusicPlaying = false;
+            let musicLoaded = false;
+            
+            // Mostrar mensaje de carga
+            musicLoading.style.display = 'block';
+            
+            // Verificar si la música se carga correctamente
+            backgroundMusic.addEventListener('canplaythrough', function() {
+                musicLoaded = true;
+                musicLoading.style.display = 'none';
+                console.log('Música cargada correctamente');
+            });
+            
+            backgroundMusic.addEventListener('error', function() {
+                musicLoading.innerHTML = 'Error cargando música';
+                setTimeout(() => {
+                    musicLoading.style.display = 'none';
+                }, 3000);
+                console.error('Error al cargar la música');
+            });
+            
+            // Crear corazones flotantes
+            function createFloatingHearts() {
+                for (let i = 0; i < 25; i++) {
+                    const heart = document.createElement('div');
+                    heart.classList.add('floating-heart');
+                    heart.innerHTML = getRandomHeart();
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                    heart.style.animationDelay = (Math.random() * 5) + 's';
+                    heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                    floatingHearts.appendChild(heart);
+                }
+            }
+            
+            // Crear estrellas flotantes
+            function createFloatingStars() {
+                for (let i = 0; i < 15; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('floating-star');
+                    star.innerHTML = '✨';
+                    star.style.left = Math.random() * 100 + 'vw';
+                    star.style.fontSize = (Math.random() * 15 + 10) + 'px';
+                    star.style.animationDelay = (Math.random() * 5) + 's';
+                    star.style.animationDuration = (Math.random() * 5 + 8) + 's';
+                    floatingStars.appendChild(star);
+                }
+            }
+            
+            // Obtener un corazón aleatorio
+            function getRandomHeart() {
+                const hearts = ['💖', '💕', '💗', '💓', '💘', '💝', '💞', '❤️', '🧡', '💛', '💚', '💙', '💜'];
+                return hearts[Math.floor(Math.random() * hearts.length)];
+            }
+            
+            // Crear confeti
+            function createConfetti() {
+                for (let i = 0; i < 100; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.classList.add('confetti');
+                        confetti.style.left = Math.random() * 100 + 'vw';
+                        confetti.style.backgroundColor = getRandomColor();
+                        confetti.style.width = Math.random() * 10 + 5 + 'px';
+                        confetti.style.height = Math.random() * 10 + 5 + 'px';
+                        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                        confetti.style.animation = `confettiFall ${Math.random() * 3 + 2}s linear forwards`;
+                        document.body.appendChild(confetti);
+                        
+                        setTimeout(() => confetti.remove(), 5000);
+                    }, i * 30);
+                }
+                
+                // Agregar animación de confeti
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes confettiFall {
+                        0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+                        100% { transform: translateY(100vh) rotate(${Math.random() * 360}deg); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            function getRandomColor() {
+                const colors = ['#ff5ca1', '#d63384', '#ff2f84', '#ff8cb8', '#ffb6d0', '#ffd700', '#ffed4e'];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            
+            // Crear indicadores del carrusel
+            function createIndicators() {
+                for (let i = 0; i < totalSlides; i++) {
+                    const indicator = document.createElement('div');
+                    indicator.classList.add('indicator');
+                    if (i === 0) indicator.classList.add('active');
+                    indicator.addEventListener('click', () => goToSlide(i));
+                    indicators.appendChild(indicator);
+                }
+            }
+            
+            // Ir a una slide específica
+            function goToSlide(slideIndex) {
+                currentSlide = slideIndex;
+                updateCarousel();
+            }
+            
+            // Actualizar carrusel
+            function updateCarousel() {
+                carouselSlider.style.transform = `translateX(-${currentSlide * 100}%)`;
+                
+                // Actualizar indicadores
+                document.querySelectorAll('.indicator').forEach((indicator, index) => {
+                    if (index === currentSlide) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Siguiente slide
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                updateCarousel();
+            }
+            
+            // Slide anterior
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                updateCarousel();
+            }
+            
+            // Reproducir sonido de sobre
+            function playEnvelopeSound() {
+                if (envelopeSound.readyState >= 2) {
+                    envelopeSound.currentTime = 0;
+                    envelopeSound.play().catch(e => console.log("No se pudo reproducir el sonido del sobre: ", e));
+                }
+            }
+            
+            // Reproducir sonido de carta
+            function playLetterSound() {
+                if (letterSound.readyState >= 2) {
+                    letterSound.currentTime = 0;
+                    letterSound.play().catch(e => console.log("No se pudo reproducir el sonido de la carta: ", e));
+                }
+            }
+            
+            // Controlar música de fondo
+            function toggleMusic() {
+                if (!musicLoaded) {
+                    musicLoading.style.display = 'block';
+                    musicLoading.innerHTML = 'Música no disponible';
+                    setTimeout(() => {
+                        musicLoading.style.display = 'none';
+                    }, 2000);
+                    return;
+                }
+                
+                if (isMusicPlaying) {
+                    backgroundMusic.pause();
+                    audioBtn.innerHTML = '<i class="fas fa-music"></i>';
+                } else {
+                    backgroundMusic.play().catch(e => {
+                        console.log("No se pudo reproducir la música: ", e);
+                        musicLoading.style.display = 'block';
+                        musicLoading.innerHTML = 'Haz clic en la página para activar audio';
+                        setTimeout(() => {
+                            musicLoading.style.display = 'none';
+                        }, 3000);
+                    });
+                    audioBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                }
+                isMusicPlaying = !isMusicPlaying;
+            }
+            
+            // Abrir carta
+            function openLetter() {
+                if (isOpening) return;
+                isOpening = true;
+                
+                // Reproducir sonido del sobre
+                playEnvelopeSound();
+                
+                // Abrir sobre
+                envelope.classList.add('open');
+                
+                // Esperar a que se abra el sobre y luego mostrar la carta
+                setTimeout(() => {
+                    letterContainer.classList.add('active');
+                    
+                    // Esperar un poco más para que la carta se desdoble
+                    setTimeout(() => {
+                        letter.classList.add('open');
+                        
+                        // Reproducir sonido de carta
+                        playLetterSound();
+                        
+                        // Mostrar carrusel después de que la carta esté completamente abierta
+                        setTimeout(() => {
+                            carousel.classList.add('active');
+                            createConfetti();
+                            
+                            // Ocultar instrucción
+                            document.querySelector('.instruction').style.display = 'none';
+                        }, 500);
+                    }, 300);
+                }, 800);
+            }
+            
+            // Event listeners
+            envelope.addEventListener('click', openLetter);
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            audioBtn.addEventListener('click', toggleMusic);
+            
+            // Permitir la reproducción de audio después de la interacción del usuario
+            document.body.addEventListener('click', function() {
+                // Esta función vacía permite que los navegadores reproduzcan audio después de la interacción del usuario
+            }, { once: true });
+            
+            // Inicialización
+            createFloatingHearts();
+            createFloatingStars();
+            createIndicators();
+            
+            // Auto-avance del carrusel
+            setInterval(nextSlide, 5000);
+        });
+    </script>
+</body>
+</html>
